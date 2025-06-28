@@ -1,4 +1,5 @@
 # Spring for Cadence Java Client
 
 # License
-MIT License, please see [LICENSE](LICENSE) for details.
+
+The project license file is available [here](LICENSE).

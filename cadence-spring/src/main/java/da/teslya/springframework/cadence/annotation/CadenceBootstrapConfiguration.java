@@ -7,6 +7,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.type.AnnotationMetadata;
 
+/**
+ * @author Dmitry Teslya
+ */
 public class CadenceBootstrapConfiguration implements ImportBeanDefinitionRegistrar {
 
   @Override

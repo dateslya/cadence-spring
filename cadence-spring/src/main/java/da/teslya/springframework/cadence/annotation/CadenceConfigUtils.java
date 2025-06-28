@@ -2,6 +2,9 @@ package da.teslya.springframework.cadence.annotation;
 
 import lombok.experimental.UtilityClass;
 
+/**
+ * @author Dmitry Teslya
+ */
 @UtilityClass
 public class CadenceConfigUtils {
 

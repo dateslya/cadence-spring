@@ -4,6 +4,9 @@ import org.springframework.context.annotation.DeferredImportSelector;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotationMetadata;
 
+/**
+ * @author Dmitry Teslya
+ */
 @Order
 public class CadenceConfigurationSelector implements DeferredImportSelector {
 
