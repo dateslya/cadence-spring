@@ -28,7 +28,7 @@ public class Application implements WorkerFactoryConfigurer, WorkflowOptionsConf
   }
 
   @Override
-  public void configureWorkerFactory(WorkerFactory factory, Map<String, Class<?>> workflowBeans,
+  public void configure(WorkerFactory factory, Map<String, Class<?>> workflowBeans,
       Map<String, Class<?>> activityBeans) {
 
     Worker worker = factory.newWorker("my_task_list");

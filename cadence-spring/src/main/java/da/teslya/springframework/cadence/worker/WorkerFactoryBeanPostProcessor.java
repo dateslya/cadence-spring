@@ -84,7 +84,7 @@ public class WorkerFactoryBeanPostProcessor implements BeanDefinitionRegistryPos
     if (bean instanceof WorkerFactory factory) {
       WorkerFactoryConfigurer configurer = applicationContext.getBean(
           WorkerFactoryConfigurer.class);
-      configurer.configureWorkerFactory(factory, workflowBeans, activityBeans);
+      configurer.configure(factory, workflowBeans, activityBeans);
     }
 
     return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);

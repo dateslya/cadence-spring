@@ -5,6 +5,6 @@ import java.util.Map;
 
 public interface WorkerFactoryConfigurer {
 
-  void configureWorkerFactory(WorkerFactory factory, Map<String, Class<?>> workflowBeans,
+  void configure(WorkerFactory factory, Map<String, Class<?>> workflowBeans,
       Map<String, Class<?>> activityBeans);
 }
