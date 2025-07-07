@@ -8,6 +8,6 @@ import java.util.Map;
  */
 public interface WorkerFactoryConfigurer {
 
-  void configure(WorkerFactory factory, Map<String, Class<?>> workflowBeans,
-      Map<String, Class<?>> activityBeans);
+  void configure(WorkerFactory factory, Map<String, Class<?>> workflowImplementations,
+      Map<String, Class<?>> activityImplementations);
 }

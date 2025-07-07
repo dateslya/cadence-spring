@@ -31,17 +31,17 @@ public class Application implements WorkerFactoryConfigurer, WorkflowOptionsConf
   }
 
   @Override
-  public void configure(WorkerFactory factory, Map<String, Class<?>> workflowBeans,
-      Map<String, Class<?>> activityBeans) {
+  public void configure(WorkerFactory factory, Map<String, Class<?>> workflowImplementations,
+      Map<String, Class<?>> activityImplementations) {
 
     Worker worker = factory.newWorker("my_task_list");
 
-    workflowBeans.forEach((name, clazz) ->
+    workflowImplementations.forEach((name, clazz) ->
         worker.addWorkflowImplementationFactory((Class) clazz,
-            () -> applicationContext.getBean(name)));
+            () -> applicationContext.getBean(name, clazz)));
 
     worker.registerActivitiesImplementations(
-        activityBeans.keySet().stream().map(applicationContext::getBean).toArray());
+        activityImplementations.keySet().stream().map(applicationContext::getBean).toArray());
   }
 
   @Override

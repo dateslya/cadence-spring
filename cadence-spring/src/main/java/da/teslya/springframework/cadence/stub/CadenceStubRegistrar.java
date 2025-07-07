@@ -85,7 +85,8 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
     String importingClassName = importingClassMetadata.getClassName();
     Map<String, Object> attributes = importingClassMetadata.getAnnotationAttributes(
         EnableCadence.class.getName());
-    Assert.notNull(attributes, "@EnableCadenceStub should be specified");
+    Assert.notNull(attributes,
+        String.format("@%S should be specified", EnableCadence.class.getSimpleName()));
 
     AnnotationAttributes annotationAttributes = AnnotationAttributes.fromMap(attributes);
     Class<?>[] stubs = annotationAttributes.getClassArray("stubs");
@@ -141,8 +142,7 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
   }
 
   private ClassPathScanningCandidateComponentProvider createCandidateComponentProvider() {
-    return new ClassPathScanningCandidateComponentProvider(
-        false) {
+    return new ClassPathScanningCandidateComponentProvider(false) {
       @Override
       protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
         AnnotationMetadata metadata = beanDefinition.getMetadata();
@@ -176,7 +176,7 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
           String.format("%s doesn't have @%s", className, annotationType.getName()));
 
       Class<?> type = ClassUtils.resolveClassName(className, null);
-      String name = getStubName(attributes, type);
+      String name = getName(attributes, type);
 
       AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(
               factoryBeanType)
@@ -191,7 +191,7 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
           type.getName());
     }
 
-    private String getStubName(AnnotationAttributes attributes, Class<?> type) {
+    private String getName(AnnotationAttributes attributes, Class<?> type) {
 
       String name = attributes.getString("value");
 
