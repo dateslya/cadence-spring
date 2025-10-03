@@ -30,5 +30,5 @@ import com.uber.cadence.client.WorkflowOptions;
 @FunctionalInterface
 public interface WorkflowOptionsConfigurer {
 
-  void configure(String name, WorkflowOptions.Builder builder);
+  void configure(String workflowName, WorkflowOptions.Builder optionsBuilder);
 }

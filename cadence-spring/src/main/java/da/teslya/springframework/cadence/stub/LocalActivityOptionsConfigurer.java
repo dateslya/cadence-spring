@@ -30,5 +30,5 @@ import com.uber.cadence.activity.LocalActivityOptions;
 @FunctionalInterface
 public interface LocalActivityOptionsConfigurer {
 
-  void configure(String name, LocalActivityOptions.Builder builder);
+  void configure(String activityName, LocalActivityOptions.Builder optionsBuilder);
 }

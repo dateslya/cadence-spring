@@ -24,30 +24,39 @@ package da.teslya.springframework.cadence.stub;
 
 import com.uber.cadence.client.WorkflowClient;
 import com.uber.cadence.client.WorkflowOptions;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author Dmitry Teslya
  */
-@Setter
 @RequiredArgsConstructor
-public class WorkflowStubFactoryBean<T> implements StubFactoryBean<T> {
+public class WorkflowStubFactoryBean<T> implements StubFactoryBean<T>, ApplicationContextAware,
+    InitializingBean {
 
   private final String name;
   private final Class<T> type;
 
-  @Autowired
-  private WorkflowOptionsConfigurer optionsConfigurer;
-  @Autowired
+  private ApplicationContext applicationContext;
   private WorkflowClient workflowClient;
+  private List<WorkflowOptionsConfigurer> optionsConfigurers;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    workflowClient = applicationContext.getBean(WorkflowClient.class);
+    optionsConfigurers = applicationContext.getBeanProvider(WorkflowOptionsConfigurer.class)
+        .orderedStream().toList();
+  }
 
   @Override
   public T getObject() throws Exception {
 
     WorkflowOptions.Builder builder = new WorkflowOptions.Builder();
-    optionsConfigurer.configure(name, builder);
+    optionsConfigurers.forEach(c -> c.configure(name, builder));
     WorkflowOptions options = builder.build();
 
     return workflowClient.newWorkflowStub(type, options);
@@ -56,5 +65,10 @@ public class WorkflowStubFactoryBean<T> implements StubFactoryBean<T> {
   @Override
   public Class<?> getObjectType() {
     return type;
+  }
+
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
   }
 }

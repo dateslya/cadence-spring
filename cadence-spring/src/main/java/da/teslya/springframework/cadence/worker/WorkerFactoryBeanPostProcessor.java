@@ -22,18 +22,12 @@
 
 package da.teslya.springframework.cadence.worker;
 
-import com.uber.cadence.activity.ActivityMethod;
 import com.uber.cadence.worker.WorkerFactory;
-import com.uber.cadence.workflow.WorkflowMethod;
 import da.teslya.springframework.cadence.annotation.ActivityImplementation;
 import da.teslya.springframework.cadence.annotation.WorkflowImplementation;
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -44,7 +38,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 
@@ -70,24 +63,32 @@ public class WorkerFactoryBeanPostProcessor implements BeanDefinitionRegistryPos
         AnnotationMetadata metadata = annotatedBeanDefinition.getMetadata();
         if (metadata.isConcrete()) {
           if (metadata.hasAnnotation(WorkflowImplementation.class.getName())) {
-            ImplementationRegistrar.WORKFLOW.register(beanName, annotatedBeanDefinition,
-                workflowImplementations::put);
+            registerImplementation(beanName, annotatedBeanDefinition, workflowImplementations::put);
           } else if (metadata.hasAnnotation(ActivityImplementation.class.getName())) {
-            ImplementationRegistrar.ACTIVITY.register(beanName, annotatedBeanDefinition,
-                activityImplementations::put);
+            registerImplementation(beanName, annotatedBeanDefinition, activityImplementations::put);
           }
         }
       }
     }
   }
 
+  @SneakyThrows
+  private void registerImplementation(String beanName, AnnotatedBeanDefinition beanDefinition,
+      BiFunction<String, Class<?>, Class<?>> collector) {
+    AnnotationMetadata metadata = beanDefinition.getMetadata();
+    Class<?> beanImplementation = ClassUtils.forName(metadata.getClassName(), null);
+    collector.apply(beanName, beanImplementation);
+    beanDefinition.setAutowireCandidate(false);
+  }
+
   @Override
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
     if (bean instanceof WorkerFactory factory) {
-      WorkerFactoryConfigurer configurer = applicationContext.getBean(
-          WorkerFactoryConfigurer.class);
-      configurer.configure(factory, workflowImplementations, activityImplementations);
+      applicationContext.getBeanProvider(WorkerFactoryConfigurer.class)
+          .orderedStream()
+          .forEach(c -> c.configure(beanName, factory, workflowImplementations,
+              activityImplementations));
     }
 
     return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
@@ -96,43 +97,5 @@ public class WorkerFactoryBeanPostProcessor implements BeanDefinitionRegistryPos
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
     this.applicationContext = applicationContext;
-  }
-
-  @RequiredArgsConstructor
-  private enum ImplementationRegistrar {
-
-    WORKFLOW(WorkflowMethod.class),
-    ACTIVITY(ActivityMethod.class);
-
-    private final Class<? extends Annotation> annotationType;
-
-    private void register(String beanName, AnnotatedBeanDefinition beanDefinition,
-        BiFunction<String, Class<?>, Class<?>> collector) {
-      AnnotationMetadata metadata = beanDefinition.getMetadata();
-      Class<?> implementationInterface = resolve(metadata.getClassName());
-      collector.apply(beanName, implementationInterface);
-      beanDefinition.setAutowireCandidate(false);
-    }
-
-    private Class<?> resolve(String className) {
-      Class<?> clazz = forName(className);
-      return Arrays.stream(clazz.getInterfaces())
-          .filter(this::hasAnnotatedMethods)
-          .findFirst()
-          .orElseThrow(() -> new IllegalArgumentException(
-              String.format("%s doesn't have interface with @%s", className,
-                  annotationType.getSimpleName())));
-    }
-
-    @SneakyThrows
-    private Class<?> forName(String className) {
-      return ClassUtils.forName(className, null);
-    }
-
-    private boolean hasAnnotatedMethods(Class<?> clazz) {
-      return Arrays.stream(clazz.getMethods())
-          .map(m -> AnnotationUtils.getAnnotation(m, annotationType))
-          .anyMatch(Objects::nonNull);
-    }
   }
 }

@@ -24,28 +24,37 @@ package da.teslya.springframework.cadence.stub;
 
 import com.uber.cadence.activity.ActivityOptions;
 import com.uber.cadence.workflow.Workflow;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author Dmitry Teslya
  */
-@Setter
 @RequiredArgsConstructor
-public class ActivityStubFactoryBean<T> implements StubFactoryBean<T> {
+public class ActivityStubFactoryBean<T> implements StubFactoryBean<T>, ApplicationContextAware,
+    InitializingBean {
 
   private final String name;
   private final Class<T> type;
 
-  @Autowired
-  private ActivityOptionsConfigurer optionsConfigurer;
+  private ApplicationContext applicationContext;
+  private List<ActivityOptionsConfigurer> optionsConfigurers;
+
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    optionsConfigurers = applicationContext.getBeanProvider(ActivityOptionsConfigurer.class)
+        .orderedStream().toList();
+  }
 
   @Override
   public T getObject() throws Exception {
 
     ActivityOptions.Builder builder = new ActivityOptions.Builder();
-    optionsConfigurer.configure(name, builder);
+    optionsConfigurers.forEach(c -> c.configure(name, builder));
     ActivityOptions options = builder.build();
 
     return Workflow.newActivityStub(type, options);
@@ -54,5 +63,10 @@ public class ActivityStubFactoryBean<T> implements StubFactoryBean<T> {
   @Override
   public Class<?> getObjectType() {
     return type;
+  }
+
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
   }
 }

@@ -12,17 +12,20 @@ import org.springframework.core.type.AnnotationMetadata;
  */
 public class CadenceBootstrapConfiguration implements ImportBeanDefinitionRegistrar {
 
+  public static final String WORKER_FACTORY_PROCESSOR_BEAN_NAME = "da.teslya.springframework.cadence.worker.internalWorkerFactoryBeanPostProcessor";
+  public static final String WORKER_CONTAINER_BEAN_NAME = "da.teslya.springframework.cadence.worker.internalWorkerContainer";
+
   @Override
   public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
       BeanDefinitionRegistry registry) {
 
-    if (!registry.containsBeanDefinition(CadenceConfigUtils.WORKER_FACTORY_PROCESSOR_BEAN_NAME)) {
-      registry.registerBeanDefinition(CadenceConfigUtils.WORKER_FACTORY_PROCESSOR_BEAN_NAME,
+    if (!registry.containsBeanDefinition(WORKER_FACTORY_PROCESSOR_BEAN_NAME)) {
+      registry.registerBeanDefinition(WORKER_FACTORY_PROCESSOR_BEAN_NAME,
           new RootBeanDefinition(WorkerFactoryBeanPostProcessor.class));
     }
 
-    if (!registry.containsBeanDefinition(CadenceConfigUtils.WORKER_CONTAINER_BEAN_NAME)) {
-      registry.registerBeanDefinition(CadenceConfigUtils.WORKER_CONTAINER_BEAN_NAME,
+    if (!registry.containsBeanDefinition(WORKER_CONTAINER_BEAN_NAME)) {
+      registry.registerBeanDefinition(WORKER_CONTAINER_BEAN_NAME,
           new RootBeanDefinition(WorkerContainer.class));
     }
   }

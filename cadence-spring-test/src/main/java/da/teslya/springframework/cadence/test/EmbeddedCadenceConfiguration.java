@@ -63,12 +63,12 @@ public class EmbeddedCadenceConfiguration {
   }
 
   @Bean
-  public WorkerFactory testWorkerFactory(TestWorkflowEnvironment environment) {
-    return environment.getWorkerFactory();
+  public WorkflowClient testWorkflowClient(TestWorkflowEnvironment environment) {
+    return environment.newWorkflowClient();
   }
 
   @Bean
-  public WorkflowClient testWorkflowClient(TestWorkflowEnvironment environment) {
-    return environment.newWorkflowClient();
+  public WorkerFactory testWorkerFactory(TestWorkflowEnvironment environment) {
+    return environment.getWorkerFactory();
   }
 }

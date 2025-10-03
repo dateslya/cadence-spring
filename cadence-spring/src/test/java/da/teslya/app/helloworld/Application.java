@@ -31,29 +31,31 @@ public class Application implements WorkerFactoryConfigurer, WorkflowOptionsConf
   }
 
   @Override
-  public void configure(WorkerFactory factory, Map<String, Class<?>> workflowImplementations,
+  public void configure(String factoryName, WorkerFactory factory,
+      Map<String, Class<?>> workflowImplementations,
       Map<String, Class<?>> activityImplementations) {
 
     Worker worker = factory.newWorker("my_task_list");
 
-    workflowImplementations.forEach((name, clazz) ->
-        worker.addWorkflowImplementationFactory((Class) clazz,
-            () -> applicationContext.getBean(name, clazz)));
-
+    workflowImplementations.forEach((name, clazz) -> {
+      Class<?> workflowInterface = clazz.getInterfaces()[0];
+      worker.addWorkflowImplementationFactory((Class) workflowInterface,
+          () -> applicationContext.getBean(name, workflowInterface));
+    });
     worker.registerActivitiesImplementations(
         activityImplementations.keySet().stream().map(applicationContext::getBean).toArray());
   }
 
   @Override
-  public void configure(String name, WorkflowOptions.Builder builder) {
-    builder
+  public void configure(String workflowName, WorkflowOptions.Builder optionsBuilder) {
+    optionsBuilder
         .setTaskList("my_task_list")
         .setExecutionStartToCloseTimeout(Duration.ofSeconds(5));
   }
 
   @Override
-  public void configure(String name, ActivityOptions.Builder builder) {
-    builder
+  public void configure(String activityName, ActivityOptions.Builder optionsBuilder) {
+    optionsBuilder
         .setScheduleToCloseTimeout(Duration.ofSeconds(5));
   }
 
