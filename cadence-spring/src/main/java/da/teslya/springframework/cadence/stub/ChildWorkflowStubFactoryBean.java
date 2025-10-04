@@ -42,11 +42,11 @@ public class ChildWorkflowStubFactoryBean<T> implements StubFactoryBean<T>,
   private final Class<T> type;
 
   private ApplicationContext applicationContext;
-  private List<ChildWorkflowOptionsConfigurer> optionsConfigurers;
+  private List<ChildWorkflowOptionsCustomizer> optionsCustomizers;
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    optionsConfigurers = applicationContext.getBeanProvider(ChildWorkflowOptionsConfigurer.class)
+    optionsCustomizers = applicationContext.getBeanProvider(ChildWorkflowOptionsCustomizer.class)
         .orderedStream().toList();
   }
 
@@ -54,7 +54,7 @@ public class ChildWorkflowStubFactoryBean<T> implements StubFactoryBean<T>,
   public T getObject() throws Exception {
 
     ChildWorkflowOptions.Builder builder = new ChildWorkflowOptions.Builder();
-    optionsConfigurers.forEach(c -> c.configure(name, builder));
+    optionsCustomizers.forEach(c -> c.customize(name, builder));
     ChildWorkflowOptions options = builder.build();
 
     return Workflow.newChildWorkflowStub(type, options);

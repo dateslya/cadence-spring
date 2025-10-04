@@ -43,12 +43,12 @@ public class WorkflowStubFactoryBean<T> implements StubFactoryBean<T>, Applicati
 
   private ApplicationContext applicationContext;
   private WorkflowClient workflowClient;
-  private List<WorkflowOptionsConfigurer> optionsConfigurers;
+  private List<WorkflowOptionsCustomizer> optionsCustomizers;
 
   @Override
   public void afterPropertiesSet() throws Exception {
     workflowClient = applicationContext.getBean(WorkflowClient.class);
-    optionsConfigurers = applicationContext.getBeanProvider(WorkflowOptionsConfigurer.class)
+    optionsCustomizers = applicationContext.getBeanProvider(WorkflowOptionsCustomizer.class)
         .orderedStream().toList();
   }
 
@@ -56,7 +56,7 @@ public class WorkflowStubFactoryBean<T> implements StubFactoryBean<T>, Applicati
   public T getObject() throws Exception {
 
     WorkflowOptions.Builder builder = new WorkflowOptions.Builder();
-    optionsConfigurers.forEach(c -> c.configure(name, builder));
+    optionsCustomizers.forEach(c -> c.customize(name, builder));
     WorkflowOptions options = builder.build();
 
     return workflowClient.newWorkflowStub(type, options);

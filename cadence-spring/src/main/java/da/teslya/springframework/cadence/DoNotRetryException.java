@@ -25,16 +25,13 @@ package da.teslya.springframework.cadence;
 /**
  * @author Dmitry Teslya
  */
-public class DoNotRetryException extends RuntimeException {
+public class DoNotRetryException extends CadenceException {
 
-  public DoNotRetryException() {
+  public DoNotRetryException(String msg) {
+    super(msg);
   }
 
-  public DoNotRetryException(String message) {
-    super(message);
-  }
-
-  public DoNotRetryException(String message, Throwable cause) {
-    super(message, cause);
+  public DoNotRetryException(String msg, Throwable cause) {
+    super(msg, cause);
   }
 }

@@ -28,7 +28,7 @@ import com.uber.cadence.activity.ActivityOptions;
  * @author Dmitry Teslya
  */
 @FunctionalInterface
-public interface ActivityOptionsConfigurer {
+public interface ActivityOptionsCustomizer {
 
-  void configure(String activityName, ActivityOptions.Builder optionsBuilder);
+  void customize(String activityName, ActivityOptions.Builder optionsBuilder);
 }

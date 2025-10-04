@@ -28,7 +28,7 @@ import com.uber.cadence.workflow.ChildWorkflowOptions;
  * @author Dmitry Teslya
  */
 @FunctionalInterface
-public interface ChildWorkflowOptionsConfigurer {
+public interface ChildWorkflowOptionsCustomizer {
 
-  void configure(String workflowName, ChildWorkflowOptions.Builder optionsBuilder);
+  void customize(String workflowName, ChildWorkflowOptions.Builder optionsBuilder);
 }

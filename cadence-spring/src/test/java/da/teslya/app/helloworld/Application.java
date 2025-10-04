@@ -5,9 +5,9 @@ import com.uber.cadence.client.WorkflowOptions;
 import com.uber.cadence.worker.Worker;
 import com.uber.cadence.worker.WorkerFactory;
 import da.teslya.springframework.cadence.annotation.EnableCadence;
-import da.teslya.springframework.cadence.stub.ActivityOptionsConfigurer;
-import da.teslya.springframework.cadence.stub.WorkflowOptionsConfigurer;
-import da.teslya.springframework.cadence.worker.WorkerFactoryConfigurer;
+import da.teslya.springframework.cadence.stub.ActivityOptionsCustomizer;
+import da.teslya.springframework.cadence.stub.WorkflowOptionsCustomizer;
+import da.teslya.springframework.cadence.worker.WorkerFactoryCustomizer;
 import java.time.Duration;
 import java.util.Map;
 import org.springframework.beans.BeansException;
@@ -21,8 +21,8 @@ import org.springframework.context.ApplicationContextAware;
  */
 @EnableCadence
 @SpringBootApplication
-public class Application implements WorkerFactoryConfigurer, WorkflowOptionsConfigurer,
-    ActivityOptionsConfigurer, ApplicationContextAware {
+public class Application implements WorkerFactoryCustomizer, WorkflowOptionsCustomizer,
+    ActivityOptionsCustomizer, ApplicationContextAware {
 
   private ApplicationContext applicationContext;
 
@@ -31,7 +31,7 @@ public class Application implements WorkerFactoryConfigurer, WorkflowOptionsConf
   }
 
   @Override
-  public void configure(String factoryName, WorkerFactory factory,
+  public void customize(String factoryName, WorkerFactory factory,
       Map<String, Class<?>> workflowImplementations,
       Map<String, Class<?>> activityImplementations) {
 
@@ -47,14 +47,14 @@ public class Application implements WorkerFactoryConfigurer, WorkflowOptionsConf
   }
 
   @Override
-  public void configure(String workflowName, WorkflowOptions.Builder optionsBuilder) {
+  public void customize(String workflowName, WorkflowOptions.Builder optionsBuilder) {
     optionsBuilder
         .setTaskList("my_task_list")
         .setExecutionStartToCloseTimeout(Duration.ofSeconds(5));
   }
 
   @Override
-  public void configure(String activityName, ActivityOptions.Builder optionsBuilder) {
+  public void customize(String activityName, ActivityOptions.Builder optionsBuilder) {
     optionsBuilder
         .setScheduleToCloseTimeout(Duration.ofSeconds(5));
   }

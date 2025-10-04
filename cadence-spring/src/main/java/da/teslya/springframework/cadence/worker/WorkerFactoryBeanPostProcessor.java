@@ -85,9 +85,9 @@ public class WorkerFactoryBeanPostProcessor implements BeanDefinitionRegistryPos
   public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
 
     if (bean instanceof WorkerFactory factory) {
-      applicationContext.getBeanProvider(WorkerFactoryConfigurer.class)
+      applicationContext.getBeanProvider(WorkerFactoryCustomizer.class)
           .orderedStream()
-          .forEach(c -> c.configure(beanName, factory, workflowImplementations,
+          .forEach(c -> c.customize(beanName, factory, workflowImplementations,
               activityImplementations));
     }
 

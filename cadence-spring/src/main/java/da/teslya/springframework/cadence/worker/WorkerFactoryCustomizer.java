@@ -6,8 +6,8 @@ import java.util.Map;
 /**
  * @author Dmitry Teslya
  */
-public interface WorkerFactoryConfigurer {
+public interface WorkerFactoryCustomizer {
 
-  void configure(String factoryName, WorkerFactory factory,
+  void customize(String factoryName, WorkerFactory factory,
       Map<String, Class<?>> workflowImplementations, Map<String, Class<?>> activityImplementations);
 }

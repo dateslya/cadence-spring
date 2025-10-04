@@ -42,11 +42,11 @@ public class ActivityStubFactoryBean<T> implements StubFactoryBean<T>, Applicati
   private final Class<T> type;
 
   private ApplicationContext applicationContext;
-  private List<ActivityOptionsConfigurer> optionsConfigurers;
+  private List<ActivityOptionsCustomizer> optionsCustomizers;
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    optionsConfigurers = applicationContext.getBeanProvider(ActivityOptionsConfigurer.class)
+    optionsCustomizers = applicationContext.getBeanProvider(ActivityOptionsCustomizer.class)
         .orderedStream().toList();
   }
 
@@ -54,7 +54,7 @@ public class ActivityStubFactoryBean<T> implements StubFactoryBean<T>, Applicati
   public T getObject() throws Exception {
 
     ActivityOptions.Builder builder = new ActivityOptions.Builder();
-    optionsConfigurers.forEach(c -> c.configure(name, builder));
+    optionsCustomizers.forEach(c -> c.customize(name, builder));
     ActivityOptions options = builder.build();
 
     return Workflow.newActivityStub(type, options);
