@@ -182,6 +182,7 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
               factoryBeanType)
           .addConstructorArgValue(name)
           .addConstructorArgValue(type)
+          .setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
           .getBeanDefinition();
       BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, name);
       holder = ScopedProxyUtils.createScopedProxy(holder, registry, true);
