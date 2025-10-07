@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -182,10 +181,8 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
               factoryBeanType)
           .addConstructorArgValue(name)
           .addConstructorArgValue(type)
-          .setRole(BeanDefinition.ROLE_INFRASTRUCTURE)
           .getBeanDefinition();
       BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, name);
-      holder = ScopedProxyUtils.createScopedProxy(holder, registry, true);
       BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
 
       log.info("Registered {}{name = '{}', interface = '{}'}", annotationType.getSimpleName(), name,
