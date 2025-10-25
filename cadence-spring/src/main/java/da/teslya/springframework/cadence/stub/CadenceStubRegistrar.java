@@ -32,7 +32,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.annotation.AnnotatedGenericBeanDefinition;
@@ -67,13 +66,13 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
       if (candidateComponent instanceof AnnotatedBeanDefinition beanDefinition) {
         AnnotationMetadata metadata = beanDefinition.getMetadata();
         if (metadata.hasAnnotation(WorkflowStub.class.getName())) {
-          InternalRegistrar.WORKFLOW.register(registry, metadata);
+          registerWorkflowStub(registry, metadata);
         } else if (metadata.hasAnnotation(ChildWorkflowStub.class.getName())) {
-          InternalRegistrar.CHILD_WORKFLOW.register(registry, metadata);
+          registerChildWorkflowStub(registry, metadata);
         } else if (metadata.hasAnnotation(ActivityStub.class.getName())) {
-          InternalRegistrar.ACTIVITY.register(registry, metadata);
+          registerActivityStub(registry, metadata);
         } else if (metadata.hasAnnotation(LocalActivityStub.class.getName())) {
-          InternalRegistrar.LOCAL_ACTIVITY.register(registry, metadata);
+          registerLocalActivityStub(registry, metadata);
         }
       }
     }
@@ -150,54 +149,61 @@ public class CadenceStubRegistrar implements ImportBeanDefinitionRegistrar {
     };
   }
 
-  @RequiredArgsConstructor
-  private enum InternalRegistrar {
+  private void registerWorkflowStub(BeanDefinitionRegistry registry, AnnotationMetadata metadata) {
+    registerStub(registry, metadata, WorkflowStubFactoryBean.class, WorkflowStub.class);
+  }
 
-    WORKFLOW(WorkflowStubFactoryBean.class, WorkflowStub.class),
-    CHILD_WORKFLOW(ChildWorkflowStubFactoryBean.class, ChildWorkflowStub.class),
-    ACTIVITY(ActivityStubFactoryBean.class, ActivityStub.class),
-    LOCAL_ACTIVITY(LocalActivityStubFactoryBean.class, LocalActivityStub.class);
+  private void registerChildWorkflowStub(BeanDefinitionRegistry registry,
+      AnnotationMetadata metadata) {
+    registerStub(registry, metadata, ChildWorkflowStubFactoryBean.class, ChildWorkflowStub.class);
+  }
 
-    private final Class<?> factoryBeanType;
-    private final Class<?> annotationType;
+  private void registerActivityStub(BeanDefinitionRegistry registry, AnnotationMetadata metadata) {
+    registerStub(registry, metadata, ActivityStubFactoryBean.class, ActivityStub.class);
+  }
 
-    private void register(BeanDefinitionRegistry registry, AnnotationMetadata metadata) {
+  private void registerLocalActivityStub(BeanDefinitionRegistry registry,
+      AnnotationMetadata metadata) {
+    registerStub(registry, metadata, LocalActivityStubFactoryBean.class, LocalActivityStub.class);
+  }
 
-      String className = metadata.getClassName();
+  private void registerStub(BeanDefinitionRegistry registry, AnnotationMetadata metadata,
+      Class<?> factoryBeanType, Class<?> annotationType) {
 
-      Assert.isTrue(metadata.isInterface(),
-          String.format("@%s can only be specified on an interface",
-              annotationType.getSimpleName()));
+    String className = metadata.getClassName();
 
-      AnnotationAttributes attributes = AnnotationAttributes.fromMap(
-          metadata.getAnnotationAttributes(annotationType.getName()));
-      Assert.notNull(attributes,
-          String.format("%s doesn't have @%s", className, annotationType.getName()));
+    Assert.isTrue(metadata.isInterface(),
+        String.format("@%s can only be specified on an interface",
+            annotationType.getSimpleName()));
 
-      Class<?> type = ClassUtils.resolveClassName(className, null);
-      String name = getName(attributes, type);
+    AnnotationAttributes attributes = AnnotationAttributes.fromMap(
+        metadata.getAnnotationAttributes(annotationType.getName()));
+    Assert.notNull(attributes,
+        String.format("%s doesn't have @%s", className, annotationType.getName()));
 
-      AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(
-              factoryBeanType)
-          .addConstructorArgValue(name)
-          .addConstructorArgValue(type)
-          .getBeanDefinition();
-      BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, name);
-      BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
+    Class<?> type = ClassUtils.resolveClassName(className, null);
+    String name = getBeanName(attributes, type);
 
-      log.info("Registered {}{name = '{}', interface = '{}'}", annotationType.getSimpleName(), name,
-          type.getName());
+    AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(
+            factoryBeanType)
+        .addConstructorArgValue(name)
+        .addConstructorArgValue(type)
+        .getBeanDefinition();
+    BeanDefinitionHolder holder = new BeanDefinitionHolder(beanDefinition, name);
+    BeanDefinitionReaderUtils.registerBeanDefinition(holder, registry);
+
+    log.info("Registered {}{name = '{}', interface = '{}'}", annotationType.getSimpleName(), name,
+        type.getName());
+  }
+
+  private String getBeanName(AnnotationAttributes attributes, Class<?> type) {
+
+    String name = attributes.getString("value");
+
+    if (!StringUtils.hasText(name)) {
+      name = Introspector.decapitalize(type.getSimpleName());
     }
 
-    private String getName(AnnotationAttributes attributes, Class<?> type) {
-
-      String name = attributes.getString("value");
-
-      if (!StringUtils.hasText(name)) {
-        name = Introspector.decapitalize(type.getSimpleName());
-      }
-
-      return name;
-    }
+    return name;
   }
 }

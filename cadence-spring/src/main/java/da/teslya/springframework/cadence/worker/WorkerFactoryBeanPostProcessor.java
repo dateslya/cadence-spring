@@ -63,9 +63,9 @@ public class WorkerFactoryBeanPostProcessor implements BeanDefinitionRegistryPos
         AnnotationMetadata metadata = annotatedBeanDefinition.getMetadata();
         if (metadata.isConcrete()) {
           if (metadata.hasAnnotation(WorkflowImplementation.class.getName())) {
-            registerImplementation(beanName, annotatedBeanDefinition, workflowImplementations::put);
+            collectImplementation(beanName, annotatedBeanDefinition, workflowImplementations::put);
           } else if (metadata.hasAnnotation(ActivityImplementation.class.getName())) {
-            registerImplementation(beanName, annotatedBeanDefinition, activityImplementations::put);
+            collectImplementation(beanName, annotatedBeanDefinition, activityImplementations::put);
           }
         }
       }
@@ -73,7 +73,7 @@ public class WorkerFactoryBeanPostProcessor implements BeanDefinitionRegistryPos
   }
 
   @SneakyThrows
-  private void registerImplementation(String beanName, AnnotatedBeanDefinition beanDefinition,
+  private void collectImplementation(String beanName, AnnotatedBeanDefinition beanDefinition,
       BiFunction<String, Class<?>, Class<?>> collector) {
     AnnotationMetadata metadata = beanDefinition.getMetadata();
     Class<?> beanImplementation = ClassUtils.forName(metadata.getClassName(), null);
