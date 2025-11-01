@@ -20,18 +20,23 @@
  * SOFTWARE.
  */
 
-package da.teslya.app.helloworld.activity;
+package da.teslya.app.helloworld.workflow;
 
-import da.teslya.springframework.cadence.annotation.ActivityImplementation;
+import da.teslya.app.helloworld.activity.GreetingActivity;
+import da.teslya.springframework.cadence.annotation.WorkflowImplementation;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Dmitry Teslya
  */
-@ActivityImplementation
-public class HelloActivityImpl implements HelloActivity {
+@WorkflowImplementation
+@RequiredArgsConstructor
+public class HelloWorldWorkflowImpl implements HelloWorldWorkflow {
+
+  private final GreetingActivity greetingActivity;
 
   @Override
-  public String hello(String name) {
-    return String.format("Hello, %s!", name);
+  public String sayHello(String name) {
+    return greetingActivity.greeting(name);
   }
 }

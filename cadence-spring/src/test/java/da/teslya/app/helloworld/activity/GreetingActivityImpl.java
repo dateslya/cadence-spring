@@ -22,12 +22,16 @@
 
 package da.teslya.app.helloworld.activity;
 
-import da.teslya.springframework.cadence.annotation.ActivityStub;
+import da.teslya.springframework.cadence.annotation.ActivityImplementation;
 
 /**
  * @author Dmitry Teslya
  */
-@ActivityStub
-public interface HelloActivityStub extends HelloActivity {
+@ActivityImplementation
+public class GreetingActivityImpl implements GreetingActivity {
 
+  @Override
+  public String greeting(String name) {
+    return String.format("Hello, %s!", name);
+  }
 }

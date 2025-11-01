@@ -22,7 +22,7 @@
 
 package da.teslya.app.helloworld;
 
-import da.teslya.app.helloworld.workflow.HelloWorkflow;
+import da.teslya.app.helloworld.workflow.HelloWorldWorkflow;
 import da.teslya.springframework.cadence.test.EmbeddedCadence;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,10 +37,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 class ApplicationTest {
 
   @Autowired
-  private HelloWorkflow helloWorkflow;
+  private HelloWorldWorkflow helloWorldWorkflow;
 
   @Test
   void testHello() throws Exception {
-    Assertions.assertEquals("Hello, Dmitry!", helloWorkflow.hello("Dmitry"));
+    Assertions.assertEquals("Hello, Dmitry!", helloWorldWorkflow.sayHello("Dmitry"));
   }
 }

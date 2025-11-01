@@ -27,8 +27,8 @@ import com.uber.cadence.activity.ActivityMethod;
 /**
  * @author Dmitry Teslya
  */
-public interface HelloActivity {
+public interface GreetingActivity {
 
   @ActivityMethod
-  String hello(String name);
+  String greeting(String name);
 }

@@ -22,12 +22,13 @@
 
 package da.teslya.app.helloworld.workflow;
 
-import da.teslya.springframework.cadence.annotation.WorkflowStub;
+import com.uber.cadence.workflow.WorkflowMethod;
 
 /**
  * @author Dmitry Teslya
  */
-@WorkflowStub
-public interface HelloWorkflowStub extends HelloWorkflow {
+public interface HelloWorldWorkflow {
 
+  @WorkflowMethod
+  String sayHello(String name);
 }
