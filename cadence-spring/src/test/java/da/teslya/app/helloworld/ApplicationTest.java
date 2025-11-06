@@ -41,6 +41,6 @@ class ApplicationTest {
 
   @Test
   void testHello() throws Exception {
-    Assertions.assertEquals("Hello, Dmitry!", helloWorldWorkflow.sayHello("Dmitry"));
+    Assertions.assertEquals("Hello, World!", helloWorldWorkflow.sayHello("World"));
   }
 }
