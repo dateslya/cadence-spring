@@ -20,27 +20,23 @@
  * SOFTWARE.
  */
 
-package da.teslya.app.helloworld;
+package da.teslya.app.helloworld.workflow;
 
-import da.teslya.app.helloworld.workflow.HelloWorldWorkflow;
-import da.teslya.springframework.cadence.test.EmbeddedCadence;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import da.teslya.app.helloworld.activity.GreetingActivity;
+import da.teslya.springframework.cadence.annotation.WorkflowImplementation;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author Dmitry Teslya
  */
-@EmbeddedCadence
-@SpringBootTest
-class ApplicationTest {
+@WorkflowImplementation
+@RequiredArgsConstructor
+public class HelloWorkflowImpl implements HelloWorkflow {
 
-  @Autowired
-  private HelloWorldWorkflow helloWorldWorkflow;
+  private final GreetingActivity greetingActivity;
 
-  @Test
-  void testHello() throws Exception {
-    Assertions.assertEquals("Hello, World!", helloWorldWorkflow.sayHello("World"));
+  @Override
+  public String sayHello(String name) {
+    return greetingActivity.greeting(name);
   }
 }

@@ -24,6 +24,8 @@ import org.springframework.context.ApplicationContextAware;
 public class Application implements WorkerFactoryCustomizer, WorkflowOptionsCustomizer,
     ActivityOptionsCustomizer, ApplicationContextAware {
 
+  private static final String TASK_LIST = "my_task_list";
+
   private ApplicationContext applicationContext;
 
   public static void main(String[] args) {
@@ -35,7 +37,7 @@ public class Application implements WorkerFactoryCustomizer, WorkflowOptionsCust
       Map<String, Class<?>> workflowImplementations,
       Map<String, Class<?>> activityImplementations) {
 
-    Worker worker = factory.newWorker("my_task_list");
+    Worker worker = factory.newWorker(TASK_LIST);
 
     workflowImplementations.forEach((name, clazz) -> {
       Class<?> workflowInterface = clazz.getInterfaces()[0];
@@ -49,7 +51,7 @@ public class Application implements WorkerFactoryCustomizer, WorkflowOptionsCust
   @Override
   public void customize(String workflowName, WorkflowOptions.Builder optionsBuilder) {
     optionsBuilder
-        .setTaskList("my_task_list")
+        .setTaskList(TASK_LIST)
         .setExecutionStartToCloseTimeout(Duration.ofSeconds(5));
   }
 

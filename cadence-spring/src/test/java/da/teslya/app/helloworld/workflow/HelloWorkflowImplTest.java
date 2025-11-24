@@ -22,21 +22,33 @@
 
 package da.teslya.app.helloworld.workflow;
 
-import da.teslya.app.helloworld.activity.GreetingActivity;
-import da.teslya.springframework.cadence.annotation.WorkflowImplementation;
-import lombok.RequiredArgsConstructor;
+import da.teslya.springframework.cadence.test.EmbeddedCadence;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 
 /**
  * @author Dmitry Teslya
  */
-@WorkflowImplementation
-@RequiredArgsConstructor
-public class HelloWorldWorkflowImpl implements HelloWorldWorkflow {
+@EmbeddedCadence
+@SpringBootTest
+class HelloWorkflowImplTest {
 
-  private final GreetingActivity greetingActivity;
+  @Autowired
+  private ApplicationContext applicationContext;
 
-  @Override
-  public String sayHello(String name) {
-    return greetingActivity.greeting(name);
+  private HelloWorkflow helloWorkflow;
+
+  @BeforeEach
+  void initStub() {
+    helloWorkflow = applicationContext.getBean(HelloWorkflow.class);
+  }
+
+  @Test
+  void testSayHello() throws Exception {
+    Assertions.assertEquals("Hello, World!", helloWorkflow.sayHello("World"));
   }
 }
